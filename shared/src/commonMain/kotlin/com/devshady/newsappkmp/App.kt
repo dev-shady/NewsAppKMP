@@ -1,50 +1,51 @@
 package com.devshady.newsappkmp
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.devshady.newsappkmp.domain.model.Article
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.devshady.newsappkmp.data.local.NewsDatabase
+import com.devshady.newsappkmp.data.local.getDatabaseBuilder
+import com.devshady.newsappkmp.data.remote.NewsApiService
+import com.devshady.newsappkmp.data.remote.createHttpClient
+import com.devshady.newsappkmp.data.repository.NewsRepositoryImpl
 import com.devshady.newsappkmp.ui.feed.FeedScreen
-import com.devshady.newsappkmp.ui.feed.FeedsUiState
+import com.devshady.newsappkmp.ui.feed.FeedViewModel
 import com.devshady.newsappkmp.ui.theme.NewsAppKMPTheme
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
 fun App() {
     NewsAppKMPTheme {
-        // Mock data for demonstration purposes to match the UI from GitHub
-        val mockArticles = listOf(
-            Article(
-                title = "KMP is the future of cross-platform development",
-                description = "Learn how to build high-quality cross-platform apps with Kotlin Multiplatform and Compose.",
-                url = "https://kotlinlang.org/lp/multiplatform/",
-                urlToImage = "https://kotlinlang.org/assets/images/open-graph/multiplatform.png",
-                publishedAt = "2024-05-11",
-                sourceName = "Kotlin Blog"
-            ),
-            Article(
-                title = "Compose Multiplatform 1.6.1 is out!",
-                description = "Discover the latest features and improvements in Compose Multiplatform.",
-                url = "https://blog.jetbrains.com/kotlin/2024/03/compose-multiplatform-1-6-0-is-out/",
-                urlToImage = "https://blog.jetbrains.com/wp-content/uploads/2024/02/Compose-Multiplatform-1.6.0.png",
-                publishedAt = "2024-05-10",
-                sourceName = "JetBrains Blog"
+        val repository = remember {
+            val database = getDatabaseBuilder().build()
+            val apiService = NewsApiService(createHttpClient())
+            NewsRepositoryImpl(
+                apiService = apiService,
+                articleDao = database.articleDao(),
+                apiKey = NewsConfig.NEWS_API_KEY
             )
-        )
+        }
 
-        val uiState by remember { mutableStateOf(FeedsUiState.Success(mockArticles)) }
+        val viewModel: FeedViewModel = viewModel {
+            FeedViewModel(repository)
+        }
+
+        val uiState by viewModel.uiState.collectAsState()
 
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             Box(modifier = Modifier.padding(innerPadding)) {
                 FeedScreen(
                     uiState = uiState,
-                    onArticleClick = { /* Handle click */ }
-                ) { /* Handle pagination */ }
+                    onArticleClick = { /* Handle click */ },
+                    loadNextPage = { page -> viewModel.loadNextPage(page) }
+                )
             }
         }
     }
@@ -54,12 +55,4 @@ fun App() {
 @Composable
 fun AppPreview() {
     App()
-}
-
-// Helper to avoid import error if Box is not imported
-@Composable
-fun Box(modifier: Modifier, content: @Composable () -> Unit) {
-    androidx.compose.foundation.layout.Box(modifier = modifier) {
-        content()
-    }
 }
