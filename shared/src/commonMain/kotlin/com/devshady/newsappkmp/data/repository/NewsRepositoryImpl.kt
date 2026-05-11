@@ -22,10 +22,18 @@ class NewsRepositoryImpl(
     }
 
     override suspend fun refreshArticles() {
-        val response = apiService.getTopHeadlines(apiKey = apiKey)
+        // Initial refresh with page 1
+        val response = apiService.getEverything(page = 1, apiKey = apiKey)
         val entities = response.articles.map { it.toEntity() }
         articleDao.clearAll()
         articleDao.insertArticles(entities)
+    }
+
+    override suspend fun loadNextPage(page: Int): Int {
+        val response = apiService.getEverything(page = page, apiKey = apiKey)
+        val entities = response.articles.map { it.toEntity() }
+        articleDao.insertArticles(entities)
+        return response.articles.size
     }
 
     private fun ArticleEntity.toDomain(): Article {

@@ -7,17 +7,31 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 
 class NewsApiService(private val client: HttpClient) {
-    
+
     suspend fun getTopHeadlines(
-        country: String = "us",
-        category: String? = null,
+        sources: String = "the-verge",
+        page: Int,
+        pageSize: Int = 15,
         apiKey: String
     ): NewsResponse {
         return client.get("https://newsapi.org/v2/top-headlines") {
-            parameter("country", country)
-            if (category != null) {
-                parameter("category", category)
-            }
+            parameter("sources", sources)
+            parameter("page", page)
+            parameter("pageSize", pageSize)
+            parameter("apiKey", apiKey)
+        }.body()
+    }
+
+    suspend fun getEverything(
+        sources: String = "the-verge",
+        page: Int,
+        pageSize: Int = 15,
+        apiKey: String
+    ): NewsResponse {
+        return client.get("https://newsapi.org/v2/everything") {
+            parameter("sources", sources)
+            parameter("page", page)
+            parameter("pageSize", pageSize)
             parameter("apiKey", apiKey)
         }.body()
     }
