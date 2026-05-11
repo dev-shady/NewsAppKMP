@@ -76,3 +76,4 @@ jetbrains-kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.seri
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 room = { id = "androidx.room", version.ref = "room" }
+buildkonfig = { id = "com.codingfeline.buildkonfig", version = "0.20.0" }
