@@ -25,12 +25,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImagePainter
+import androidx.compose.foundation.Image
 import coil3.compose.SubcomposeAsyncImage
-import coil3.compose.SubcomposeAsyncImageContent
 import com.devshady.newsappkmp.domain.model.Article
 import com.devshady.newsappkmp.ui.animations.shimmerEffect
 
@@ -41,10 +41,12 @@ fun NewsItemRow(article: Article, onClick: (String) -> Unit) {
             .fillMaxWidth()
             .clickable { onClick(article.url) },
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(0.dp)
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier
+                .padding(12.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             NewsImage(article.urlToImage)
@@ -53,11 +55,11 @@ fun NewsItemRow(article: Article, onClick: (String) -> Unit) {
                 Text(
                     text = article.title,
                     style = MaterialTheme.typography.titleLarge,
-                    maxLines = 2,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = article.description ?: "",
                     style = MaterialTheme.typography.bodyLarge,
@@ -72,39 +74,28 @@ fun NewsItemRow(article: Article, onClick: (String) -> Unit) {
 
 @Composable
 fun NewsImage(url: String?) {
-    SubcomposeAsyncImage(
-        model = url,
-        contentDescription = null,
+    Box(
         modifier = Modifier
             .size(110.dp)
             .clip(RoundedCornerShape(8.dp)),
-        contentScale = ContentScale.Crop
+        contentAlignment = Alignment.Center
     ) {
-        when (val state = painter.state) {
-            is AsyncImagePainter.State.Loading -> {
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .shimmerEffect()
+        SubcomposeAsyncImage(
+            model = url,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            loading = {
+                Box(modifier = Modifier.fillMaxSize().shimmerEffect())
+            },
+            error = {
+                Icon(
+                    imageVector = Icons.Default.Warning,
+                    contentDescription = "Error loading image",
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(24.dp)
                 )
             }
-
-            is AsyncImagePainter.State.Error -> {
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .background(Color.DarkGray),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(Icons.Default.Warning, contentDescription = null, tint = Color.Gray)
-                }
-            }
-
-            is AsyncImagePainter.State.Success -> {
-                SubcomposeAsyncImageContent()
-            }
-
-            else -> {}
-        }
+        )
     }
 }

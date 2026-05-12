@@ -3,7 +3,6 @@ package com.devshady.newsappkmp.ui.feed
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,8 +27,7 @@ import com.devshady.newsappkmp.ui.animations.shimmerEffect
 fun FeedsShimmer() {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(0.dp)
     ) {
         items(10) {
             FeedsShimmerRow()
@@ -42,36 +40,37 @@ fun FeedsShimmerRow() {
     Card(
         modifier = Modifier
             .fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-        shape = RoundedCornerShape(12.dp)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(0.dp)
     ) {
         Row(
             modifier = Modifier
-                .padding(12.dp),
+                .padding(12.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
+                    .size(110.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .shimmerEffect()
-                    .size(110.dp)
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .shimmerEffect()
-                        .height(56.dp)
+                        .height(28.dp)
                         .fillMaxWidth()
+                        .clip(RoundedCornerShape(4.dp))
+                        .shimmerEffect()
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .shimmerEffect()
-                        .height(72.dp)
+                        .height(60.dp)
                         .fillMaxWidth()
+                        .clip(RoundedCornerShape(4.dp))
+                        .shimmerEffect()
                 )
             }
         }
